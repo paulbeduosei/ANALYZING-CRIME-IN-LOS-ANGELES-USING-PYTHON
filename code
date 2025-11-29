@@ -1,0 +1,45 @@
+# Import required libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+crimes = pd.read_csv("crimes.csv", dtype={"TIME OCC": str})
+crimes.head()
+
+# Extract the hour from "TIME OCC" (e.g., 2230 → 22)
+crimes['hour'] = crimes['TIME OCC'] // 100
+
+# Find the hour with the highest frequency of crimes
+peak_crime_hour = crimes['hour'].value_counts().idxmax()
+
+# Store as integer
+peak_crime_hour = int(peak_crime_hour)
+
+# Output the result
+print("The hour that has the highest frequency of crimes is " + str(peak_crime_hour))
+
+# Use a list for the isin method
+peak_night_crime_hours = ["2200", "2300", "2400", "0000", "0100", "0200", "0300"]
+peak_night_crime_location = crimes[crimes["TIME OCC"].isin(peak_night_crime_hours)]
+
+# Filter for night crimes: 10:00 PM (2200) to 3:59 AM (0359)
+night_crimes = crimes[(crimes["TIME OCC"] >= 2200) | (crimes["TIME OCC"] <= 359)]
+
+# Find the area with the highest number of night crimes
+peak_night_crime_location = night_crimes["AREA NAME"].value_counts().idxmax()
+
+# Output the result
+print("The area that has the largest frequency of night crimes (crimes committed between 10pm and 3:59am) is " + str(peak_night_crime_location))
+
+# Define age bins and labels
+age_bins = [0, 17, 25, 34, 44, 54, 64, float('inf')]
+age_labels = ["0-17", "18-25", "26-34", "35-44", "45-54", "55-64", "65+"]
+
+# Bin the victim ages
+crimes["age_group"] = pd.cut(crimes["Vict Age"], bins=age_bins, labels=age_labels, right=True)
+
+# Count the number of crimes per age group
+victim_ages = crimes["age_group"].value_counts().sort_index()
+
+# Display the result
+print(victim_ages)
